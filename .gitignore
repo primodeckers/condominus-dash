@@ -38,7 +38,7 @@ ENV/
 Thumbs.db
 
 # Arquivos de dados
-*.csv
+
 *.xlsx
 *.xls
 *.db

@@ -21,7 +21,7 @@ if not verificar_autenticacao():
     st.stop()
 
 # Título do dashboard
-st.title("📊 Dashboard Debito e Credito - Condomínio")
+st.title("📊 Debito e Credito - Ouro vermelho I - 2024")
 
 # CSS personalizado para ajustar espaçamentos
 st.markdown("""

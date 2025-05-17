@@ -1,17 +1,68 @@
 import streamlit as st
+
+# Configuração da página (DEVE ser a primeira chamada do Streamlit)
+st.set_page_config(
+    page_title="Debito/Credito - Ouro vermelho I - 2024",
+    page_icon="🏢",
+    layout="wide"
+)
+
+# Resto das importações
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime
 import locale
 from urllib.parse import urlencode
+from auth import verificar_autenticacao, logout, obter_nome_usuario
 
-# Configuração da página
-st.set_page_config(
-    page_title="Dashboard Debito e Credito - Condomínio",
-    page_icon="🏢",
-    layout="wide"
-)
+# Verifica autenticação
+if not verificar_autenticacao():
+    st.stop()
+
+# Título do dashboard
+st.title("📊 Dashboard Debito e Credito - Condomínio")
+
+# CSS personalizado para ajustar espaçamentos
+st.markdown("""
+    <style>
+    div[data-testid="stButton"] button {
+        padding: 0.1rem 1rem;
+        font-size: 0.8rem;
+    }
+    .main .block-container {
+        padding-top: 2rem;
+    }
+    .stMarkdown {
+        margin-bottom: 0.5rem;
+    }
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 2px;
+        margin-top: 0.5rem;
+    }
+    .stTabs [data-baseweb="tab"] {
+        padding: 0.5rem 1rem;
+    }
+    div[data-testid="stVerticalBlock"] > div:has(> div.stTabs) {
+        margin-top: 0.5rem;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# Informações do usuário e botão de sair na sidebar
+nome_usuario = obter_nome_usuario()
+if nome_usuario:
+    col1, col2 = st.sidebar.columns([3, 1])
+    with col1:
+        st.markdown(f"### 👤 {nome_usuario}")
+    with col2:
+        if st.button("Sair", type="primary"):
+            logout()
+            st.stop()
+    st.sidebar.markdown("---")
+
+# Sidebar para filtros
+st.sidebar.header("Filtros")
 
 # Configuração do estilo dos gráficos
 def configurar_grafico(fig):
@@ -33,7 +84,7 @@ def format_currency(value):
 # Carregando os dados
 @st.cache_data
 def load_data():
-    df = pd.read_csv('extrato_completo_2024.csv')
+    df = pd.read_csv('files/extrato_completo_2024.csv')
     # Convertendo a coluna valor para float
     df['valor'] = df['valor'].str.replace('.', '').str.replace(',', '.').astype(float)
     # Convertendo a coluna data_operacao para datetime
@@ -42,13 +93,6 @@ def load_data():
 
 # Carregando os dados
 df = load_data()
-
-# Título do dashboard
-st.title("📊 Dashboard Debito e Credito - Condomínio")
-st.markdown("---")
-
-# Sidebar para filtros
-st.sidebar.header("Filtros")
 
 # Lista ordenada dos meses
 meses_ordenados = [
@@ -107,7 +151,7 @@ total_debitos = df_filtrado[df_filtrado['tipo'] == 'debito']['valor'].sum()
 # Total de débitos em vermelho
 with col1:
     st.markdown(
-        "<div style='background:#fff0f0; border:4px solid #FF0000; border-radius:32px; padding:20px; text-align:center; min-height:110px;'>"
+        "<div style='background:#fff0f0; border:1px solid #FF0000; border-radius:5px; padding:20px; text-align:center; min-height:150px; display:flex; flex-direction:column; justify-content:center;'>"
         "<div style='color:#FF0000; font-size:1.1em; font-weight:bold; margin-bottom:8px;'>Total de Débitos</div>"
         f"<span style='color:#FF0000; font-size:2em; font-weight:bold;'>- {format_currency(total_debitos)}</span>"
         "</div>",
@@ -120,7 +164,7 @@ total_creditos = df_filtrado[df_filtrado['tipo'] == 'credito']['valor'].sum()
 # Total de créditos em verde
 with col2:
     st.markdown(
-        "<div style='background:#f0fff0; border:4px solid #00B050; border-radius:32px; padding:20px; text-align:center; min-height:110px;'>"
+        "<div style='background:#f0fff0; border:1px solid #00B050; border-radius:5px; padding:20px; text-align:center; min-height:150px; display:flex; flex-direction:column; justify-content:center;'>"
         "<div style='color:#00B050; font-size:1.1em; font-weight:bold; margin-bottom:8px;'>Total de Créditos</div>"
         f"<span style='color:#00B050; font-size:2em; font-weight:bold;'>+ {format_currency(total_creditos)}</span>"
         "</div>",
@@ -145,7 +189,7 @@ with col3:
         sinal = ""
         extra = " <span style='font-size:1.2em;'>#</span>"
     st.markdown(
-        f"<div style='background:{bg}; border:4px solid {cor}; border-radius:32px; padding:20px; text-align:center; min-height:110px;'>"
+        f"<div style='background:{bg}; border:1px solid {cor}; border-radius:5px; padding:20px; text-align:center; min-height:150px; display:flex; flex-direction:column; justify-content:center;'>"
         f"<div style='color:{cor}; font-size:1.1em; font-weight:bold; margin-bottom:8px;'>Saldo</div>"
         f"<span style='color:{cor}; font-size:2em; font-weight:bold;'>{sinal} {format_currency(abs(saldo))}{extra}</span>"
         "</div>",
@@ -153,10 +197,9 @@ with col3:
     )
 
 # Após o bloco das métricas principais (Total de Débitos, Créditos, Saldo)
-st.markdown("<div style='height: 32px;'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
 
 # Gráficos
-
 
 # Gráfico de pizza por categoria
 df_categorias = df_filtrado.groupby('categoria')['valor'].sum().reset_index()
@@ -304,7 +347,7 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
     "Consulta Completa",
     "Distribuição por Categoria",
     "Maiores Transações",
-    "Top 5 Maiores Débitos"
+    "Top 5 Maiores"
 ])
 
 with tab1:
@@ -319,11 +362,11 @@ with tab5:
     st.plotly_chart(fig_debitos, use_container_width=True, key="debitos")
 with tab6:
     st.subheader("Consulta Completa de Transações")
-    termo_pesquisa = st.text_input("🔍 Pesquisar por descrição ou documento")
+    termo_pesquisa = st.text_input("🔍 Pesquisar por descrição ou valor")
     if termo_pesquisa:
         df_consulta = df[
             df['descricao'].astype(str).str.contains(termo_pesquisa, case=False, na=False) |
-            df['doc'].astype(str).str.contains(termo_pesquisa, case=False, na=False)
+            df['valor'].astype(str).str.contains(termo_pesquisa, case=False, na=False)
         ]
     else:
         df_consulta = df
@@ -504,7 +547,7 @@ else:
 
 # Rodapé
 st.markdown("---")
-st.markdown("Dashboard criado com Streamlit | Última atualização: " + datetime.now().strftime("%d/%m/%Y"))
+st.markdown("Dashboard criado por Deckers com Streamlit | Última atualização: " + datetime.now().strftime("%d/%m/%Y"))
 
 # Cálculo dos totais de créditos e débitos
 total_creditos = df_filtrado[df_filtrado['tipo'] == 'credito']['valor'].sum()

@@ -75,7 +75,10 @@ def configurar_grafico(fig):
     return fig
 
 # Configuração do locale para formatação de valores em reais
-locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+try:
+    locale.setlocale(locale.LC_ALL, 'Portuguese_Brazil')
+except locale.Error:
+    locale.setlocale(locale.LC_ALL, '')
 
 # Função para formatar valores em reais
 def format_currency(value):

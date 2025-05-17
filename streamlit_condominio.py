@@ -87,7 +87,7 @@ def format_currency(value):
 # Carregando os dados
 @st.cache_data
 def load_data():
-    df = pd.read_csv('files/extrato_completo_2024.csv')
+    df = pd.read_csv('extrato_completo_2024.csv')
     # Convertendo a coluna valor para float
     df['valor'] = df['valor'].str.replace('.', '').str.replace(',', '.').astype(float)
     # Convertendo a coluna data_operacao para datetime

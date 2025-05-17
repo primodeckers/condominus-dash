@@ -121,7 +121,7 @@ df_final['data_operacao'] = pd.to_datetime(df_final['data_operacao'], format='%d
 df_final = df_final.sort_values('data_operacao')
 
 # Salva o resultado final
-csv_path = "files/extrato_completo_2024.csv"
+csv_path = "extrato_completo_2024.csv"
 df_final.to_csv(csv_path, index=False, encoding='utf-8-sig')
 
 print(f"\nCSV completo gerado com sucesso em {csv_path}!")

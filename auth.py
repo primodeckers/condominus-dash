@@ -34,7 +34,7 @@ def aplicar_estilo_login():
             padding: 1.5rem;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            width: 600px;
             margin: 0 auto;
         }
         .stTextInput > div > div > input {
@@ -126,3 +126,8 @@ def obter_nome_usuario():
         return None
     
     return credenciais[st.session_state.usuario_atual]['nome']
+
+aplicar_estilo_login()  # Sempre aplica o CSS
+
+if not verificar_autenticacao():
+    st.stop()

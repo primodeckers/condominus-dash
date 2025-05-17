@@ -70,15 +70,13 @@ def processar_pdf(pdf_path):
                     else:
                         # Se não é um novo registro, junta com o registro atual
                         if registro_atual:
-                            # Se a linha atual tem descrição, junta com a descrição anterior
-                            if nova_linha[1]:
-                                registro_atual[1] = registro_atual[1] + " " + nova_linha[1]
-                            # Se a linha atual tem valor, usa o valor mais recente
-                            if nova_linha[3]:
-                                registro_atual[3] = nova_linha[3]
-                            # Se a linha atual tem tipo, usa o tipo mais recente
-                            if nova_linha[4]:
-                                registro_atual[4] = nova_linha[4]
+                            # Junta todas as colunas (exceto data) ao registro atual, se houver informação
+                            for i in range(1, 5):
+                                if nova_linha[i]:
+                                    if registro_atual[i]:
+                                        registro_atual[i] = str(registro_atual[i]) + " " + str(nova_linha[i])
+                                    else:
+                                        registro_atual[i] = str(nova_linha[i])
     
     # Adiciona o último registro se existir
     if registro_atual:

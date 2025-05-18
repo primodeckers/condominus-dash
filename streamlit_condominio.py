@@ -50,7 +50,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Informações do usuário e botão de sair na sidebar
-nome_usuario = obter_nome_usuario()
+nome_usuario = obter_nome_usuario(st.session_state.usuario_atual)
 if nome_usuario:
     col1, col2 = st.sidebar.columns([3, 1])
     with col1:

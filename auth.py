@@ -4,6 +4,7 @@ import yaml
 import os
 from pathlib import Path
 
+@st.cache_data
 def carregar_credenciais():
     """Carrega as credenciais do arquivo de configuração."""
     config_path = Path('config.yaml')
@@ -29,12 +30,15 @@ def aplicar_estilo_login():
     """Aplica estilos CSS personalizados para a tela de login."""
     st.markdown("""
         <style>
+        div[data-testid="stForm"] {
+            width: 400px !important;
+            margin: 0 auto !important;
+        }
         .stForm {
             background-color: #ffffff;
             padding: 1.5rem;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 600px;
             margin: 0 auto;
         }
         .stTextInput > div > div > input {
@@ -58,15 +62,6 @@ def aplicar_estilo_login():
             text-align: center;
             color: #1E88E5;
             margin-bottom: 1.5rem;
-        }
-        div[data-testid="stForm"] {
-            width: 300px !important;
-            margin: 0 auto !important;
-        }
-        div[data-testid="stForm"] > div {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
         div[data-testid="InputInstructions"] > span:nth-child(1) {
             visibility: hidden;
@@ -116,18 +111,21 @@ def logout():
     st.session_state.usuario_atual = None
     st.rerun()
 
-def obter_nome_usuario():
+@st.cache_data
+def obter_nome_usuario(usuario_atual):
     """Retorna o nome do usuário atual."""
-    if not st.session_state.usuario_atual:
+    if not usuario_atual:
         return None
     
     credenciais = carregar_credenciais()
-    if not credenciais or st.session_state.usuario_atual not in credenciais:
+    if not credenciais or usuario_atual not in credenciais:
         return None
     
-    return credenciais[st.session_state.usuario_atual]['nome']
+    return credenciais[usuario_atual]['nome']
 
 aplicar_estilo_login()  # Sempre aplica o CSS
 
 if not verificar_autenticacao():
     st.stop()
+
+nome_usuario = obter_nome_usuario(st.session_state.usuario_atual)
